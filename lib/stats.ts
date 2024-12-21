@@ -26,6 +26,53 @@ function calculateUniversalRank(rating: number): string {
   return "100";                     // Newbie
 }
 
+// Helper function to convert rank string to number
+function getRankPercentage(rank: string): number {
+  return parseFloat(rank.replace('%', ''));
+}
+
+function calculatePowerLevel(stats: {
+  universalRank: string;
+  totalSubmissions: number;
+  acceptedSubmissions: number;
+}): PowerClass {
+  // Convert rank percentage to number
+  const rankPercentage = getRankPercentage(stats.universalRank);
+  
+  // Rest of the calculation remains same
+  const submissionScore = Math.min(100, (stats.totalSubmissions / 1000) * 100);
+  const accuracyScore = (stats.acceptedSubmissions / stats.totalSubmissions) * 100;
+  
+  const powerScore = (
+    rankPercentage * 0.5 +
+    submissionScore * 0.3 +
+    accuracyScore * 0.2
+  );
+
+  // Power class definitions remain same...
+  if (powerScore <= 5) {
+    return {
+      title: "LEGENDARY",
+      color: "text-yellow-400",
+      description: "Among the elite competitive programmers!"
+    };
+  }
+  // ... rest of the power classes ...
+}
+
+// Update the interface to match the types
+interface UserStats {
+  handle: string;
+  totalSubmissions: number;
+  acceptedSubmissions: number;
+  universalRank: string;  // Changed to string to match calculateUniversalRank return type
+  longestStreak: number;
+  mostActiveMonth: string;
+  mostActiveDay: string;
+  contributionData: Record<string, number>;
+  powerClass: PowerClass;
+}
+
 export async function processUserStats(
   user: CodeforcesUser,
   submissions: Submission[]
@@ -77,6 +124,12 @@ export async function processUserStats(
   const mostActiveMonth = Array.from(monthlySubmissions.entries())
     .reduce((a, b) => (a[1] > b[1] ? a : b))[0];
 
+  const powerClass = calculatePowerLevel({
+    universalRank: calculateUniversalRank(user.rating),
+    totalSubmissions: Object.values(contributionData).reduce((a, b) => a + b, 0),
+    acceptedSubmissions: acceptedSubmissions.length
+  });
+
   return {
     handle: user.handle,
     totalSubmissions: Object.values(contributionData).reduce((a, b) => a + b, 0),
@@ -98,6 +151,7 @@ export async function processUserStats(
       }))
       .sort((a, b) => a.date.localeCompare(b.date)),
     lastUpdated: new Date(),
+    powerClass,
   };
 }
 
