@@ -8,7 +8,7 @@ export async function rateLimit(identifier: string) {
   const now = Date.now();
   const windowStart = now - RATE_LIMIT.windowMs;
 
-  const requests = await redis.zrangebyscore(key, windowStart, '+inf');
+  const requests = await redis.zremrangebyscore(key, windowStart, '+inf');
   
   if (requests.length >= RATE_LIMIT.maxRequests) {
     return { success: false };
