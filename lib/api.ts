@@ -10,15 +10,7 @@ export async function fetchUserInfo(handle: string): Promise<CodeforcesUser> {
     throw new Error(data.comment);
   }
   
-  const user = data.result[0];
-  
-  // Construct the avatar URL directly from handle
-  const avatarUrl = `https://userpic.codeforces.org/user/${handle}/photo.jpg`;
-
-  return {
-    ...user,
-    avatar: avatarUrl
-  };
+  return data.result[0];
 }
 
 export async function fetchUserSubmissions(handle: string): Promise<Submission[]> {
@@ -32,22 +24,23 @@ export async function fetchUserSubmissions(handle: string): Promise<Submission[]
   return data.result;
 }
 
-// Instead of scraping, we'll generate contribution data from submissions
 export function generateContributionData(submissions: Submission[]): Record<string, number> {
-  const currentYear = new Date().getFullYear();
   const contributionData: Record<string, number> = {};
   
-  // Initialize all dates of the current year
-  const startDate = new Date(currentYear, 0, 1);
-  const endDate = new Date();
+  // Get current year
+  const currentYear = new Date().getFullYear();
   
-  for (let d = new Date(startDate); d <= endDate; d.setDate(d.getDate() + 1)) {
-    contributionData[d.toISOString().split('T')[0]] = 0;
+  // Initialize all dates in current year to 0
+  for (let d = new Date(currentYear, 0, 1); d <= new Date(); d.setDate(d.getDate() + 1)) {
+    const dateStr = d.toISOString().split('T')[0];
+    contributionData[dateStr] = 0;
   }
 
-  // Count submissions for each date
+  // Count submissions
   submissions.forEach(submission => {
     const date = new Date(submission.creationTimeSeconds * 1000);
+    
+    // Only count submissions from current year
     if (date.getFullYear() === currentYear) {
       const dateStr = date.toISOString().split('T')[0];
       contributionData[dateStr] = (contributionData[dateStr] || 0) + 1;
@@ -55,6 +48,16 @@ export function generateContributionData(submissions: Submission[]): Record<stri
   });
 
   return contributionData;
+}
+
+// Helper function to format date consistently
+export function formatDate(timestamp: number): string {
+  return new Date(timestamp * 1000).toISOString().split('T')[0];
+}
+
+// Helper function to get accepted submissions
+export function getAcceptedSubmissions(submissions: Submission[]): Submission[] {
+  return submissions.filter(sub => sub.verdict === 'OK');
 }
 
 export const RATE_LIMIT = {

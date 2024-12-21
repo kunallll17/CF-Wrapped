@@ -4,22 +4,19 @@ export interface CodeforcesUser {
   maxRating: number;
   rank: string;
   maxRank: string;
-  titlePhoto?: string;
-  avatar: string;
   contribution: number;
 }
 
 export interface Submission {
   id: number;
-  contestId: number;
+  contestId?: number;
   creationTimeSeconds: number;
-  programmingLanguage: string;
   verdict: string;
   problem: {
-    tags: string[];
-    rating?: number;
+    contestId?: number;
     index: string;
     name: string;
+    rating?: number;
   };
 }
 
@@ -27,16 +24,16 @@ export interface UserStats {
   handle: string;
   totalSubmissions: number;
   acceptedSubmissions: number;
-  universalRank: number;
+  universalRank: string;
   longestStreak: number;
   mostActiveMonth: string;
   mostActiveDay: string;
-  topLanguage: string;
-  languageDistribution: Record<string, number>;
-  tagDistribution: Record<string, number>;
   contributionData: Record<string, number>;
-  ratingProgression: Array<{ date: string; rating: number }>;
-  lastUpdated: Date;
+  powerClass: {
+    title: string;
+    color: string;
+    description: string;
+  };
 }
 
 export interface ApiError {
