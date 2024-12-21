@@ -23,7 +23,7 @@ const nextConfig = {
         pathname: '/**',
       }
     ],
-    domains: ['userpic.codeforces.org', 'userpic.codeforces.com'],
+    domains: ['userpic.codeforces.org', 'userpic.codeforces.com', 'codeforces.com'],
   },
 };
 

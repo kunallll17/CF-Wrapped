@@ -266,6 +266,8 @@ export async function processUserStats(
     totalSubmissions: Object.values(contributionData).reduce((a, b) => a + b, 0),
     acceptedSubmissions: acceptedSubmissions.length,
     universalRank: calculateUniversalRank(user.rating),
+    problemsSolved: new Set(acceptedSubmissions.map(s => s.problem.contestId + s.problem.index)).size,
+    totalSolved: new Set(submissions.filter(s => s.verdict === 'OK').map(s => s.problem.contestId + s.problem.index)).size,
     longestStreak: streaks.longest,
     mostActiveMonth,
     mostActiveDay: mostActiveDate,
@@ -277,5 +279,10 @@ export async function processUserStats(
     tagStats: submissionStats.tagStats,
     lastUpdated: new Date(),
     powerClass,
+    rating: {
+      maxRating: user.maxRating,
+      currentRating: user.rating
+    },
+    profilePicture: ''
   };
 }

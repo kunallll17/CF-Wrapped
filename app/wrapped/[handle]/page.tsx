@@ -209,12 +209,12 @@ export default function WrappedPage({ params }: { params: { handle: string } }) 
     if (stats) {
       const summary = {
         username: params.handle,
-        totalSolved: stats.totalSolved,
-        maxRating: stats.maxRating,
-        currentRating: stats.currentRating,
+        problemsSolved: stats.problemsSolved,
+        maxRating: stats.rating?.maxRating,
+        currentRating: stats.rating?.currentRating,
         mostActiveDay: stats.mostActiveDay,
         mostActiveMonth: stats.mostActiveMonth,
-        problemsSolved: stats.problemsSolved,
+        totalSolved: stats.totalSolved, // Changed from problemsSolved to totalSolved
         topLanguage: stats.topLanguage,
       };
 

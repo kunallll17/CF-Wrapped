@@ -28,6 +28,8 @@ interface RatingPoint {
 }
 
 export interface UserStats {
+  problemsSolved: any;
+  totalSolved: any;
   handle: string;
   totalSubmissions: number;
   acceptedSubmissions: number;
@@ -47,6 +49,11 @@ export interface UserStats {
   tagStats: Record<string, number>;
   ratingProgression: RatingPoint[];
   lastUpdated: Date;
+  profilePicture: string;
+  rating?: {
+    maxRating: number;
+    currentRating: number;
+  };
 }
 
 export interface ApiError {
