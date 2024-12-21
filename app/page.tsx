@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { toast } from '@/hooks/use-toast';
-import { Github, Code2, Trophy, Star } from 'lucide-react';
+import { Trophy } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 
@@ -20,7 +20,7 @@ export default function Home() {
       toast({
         title: "Error",
         description: "Please enter a Codeforces handle",
-        variant: "destructive"
+        variant: "destructive",
       });
       return;
     }
@@ -29,15 +29,15 @@ export default function Home() {
     try {
       const res = await fetch(`/api/stats?handle=${handle}`);
       const data = await res.json();
-      
+
       if (!res.ok) throw new Error(data.error || 'Failed to fetch user data');
-      
+
       router.push(`/wrapped/${handle}`);
     } catch (error: any) {
       toast({
         title: "Error",
         description: error.message || 'Something went wrong',
-        variant: "destructive"
+        variant: "destructive",
       });
     } finally {
       setLoading(false);
@@ -50,7 +50,39 @@ export default function Home() {
     { handle: "ecnerwala", description: "ICPC World Finalist" },
     { handle: "Um_nik", description: "Competitive Programming Expert" },
     { handle: "Benq", description: "USACO Guide Contributor" },
+    { handle: "Dominater069", description: "Top Competitive Programmer" },
   ];
+
+  function calculatePowerLevel(submissions: number, rank: string, longestStreak: number) {
+    const maxSubmissions = 1000; // Example max submissions
+    const maxStreak = 30; // Example max streak days
+    const rankValue = getRankValue(rank); // Convert rank to a numerical value
+
+    const normalizedSubmissions = (submissions / maxSubmissions) * 100;
+    const normalizedRank = (rankValue / 8) * 100; // Assuming max rank value is 8
+    const normalizedStreak = (longestStreak / maxStreak) * 100;
+
+    // Weighted average
+    const powerLevel = (0.5 * normalizedSubmissions) + (0.3 * normalizedRank) + (0.2 * normalizedStreak);
+    
+    return powerLevel;
+  }
+
+  function getRankValue(rank: string) {
+    const rankMap = {
+      "Newbie": 0,
+      "Pupil": 1,
+      "Specialist": 2,
+      "Expert": 3,
+      "Candidate Master": 4,
+      "Master": 5,
+      "International Master": 6,
+      "Grandmaster": 7,
+      "International Grandmaster": 8,
+      "Legendary Grandmaster": 9
+    };
+    return rankMap[rank as keyof typeof rankMap] || 0; // Default to 0 if rank is unknown
+  }
 
   return (
     <main className="min-h-screen bg-gradient-to-b from-background to-secondary/20">
@@ -88,7 +120,7 @@ export default function Home() {
           <h2 className="text-2xl font-semibold col-span-full mb-4">Featured Profiles</h2>
           {featuredUsers.map((user) => (
             <Link key={user.handle} href={`/wrapped/${user.handle}`}>
-              <Card className="hover:shadow-lg transition-shadow cursor-pointer">
+              <Card className="hover:shadow-lg transition-shadow cursor-pointer hover:scale-105">
                 <CardContent className="p-6">
                   <div className="flex items-center gap-4">
                     <div className="p-2 bg-primary/10 rounded-full">
@@ -105,17 +137,37 @@ export default function Home() {
           ))}
         </div>
 
-        <footer className="mt-16 text-center">
-          <p className="text-sm text-muted-foreground">
+        <footer className="mt-8 text-center space-y-4">
+          <div className="flex justify-center space-x-6 text-sm">
             <Link
               href="https://github.com/kunallll17"
               target="_blank"
               rel="noopener noreferrer"
               className="text-gray-400 hover:text-white transition-colors"
             >
+              Created by @kunallll17
+            </Link>
+
+            <Link
+              href="https://github.com/kunallll17/CF-Wrapped/issues"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-gray-400 hover:text-white transition-colors"
+            >
               Request a feature ⚡️ or report a bug 🐛
             </Link>
-          </p>
+
+            <button
+              onClick={() => {
+                // Copy UPI ID to clipboard
+                navigator.clipboard.writeText('9351415734@ptyes');
+                alert('UPI ID copied to clipboard: 9351415734@ptyes');
+              }}
+              className="text-gray-400 hover:text-white transition-colors cursor-pointer"
+            >
+              Support Project 💝
+            </button>
+          </div>
         </footer>
       </div>
     </main>

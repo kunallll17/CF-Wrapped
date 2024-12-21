@@ -8,16 +8,16 @@ import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import html2canvas from 'html2canvas';
 import { Button } from '@/components/ui/button';
+import Link from 'next/link';
+import React from 'react';
 
 export const dynamic = 'force-dynamic';
-
-// Add this function to determine contribution color
 function getContributionColor(count: number): string {
-  if (count === 0) return 'bg-gray-800';
-  if (count === 1) return 'bg-green-900';
-  if (count <= 3) return 'bg-green-700';
-  if (count <= 5) return 'bg-green-500';
-  return 'bg-green-400';
+  if (count === 0) return 'bg-[#1b1f23]';
+  if (count === 1) return 'bg-[#0e4429]';
+  if (count <= 3) return 'bg-[#006d32]';
+  if (count <= 5) return 'bg-[#26a641]';
+  return 'bg-[#39d353]';
 }
 
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
@@ -121,23 +121,35 @@ export default function WrappedPage({ params }: { params: { handle: string } }) 
   }, [params.handle]);
 
   const downloadImage = async () => {
-    if (!wrapperRef.current) return;
-    
     try {
-      const element = wrapperRef.current;
+      const element = document.getElementById('wrap');
+      if (!element) {
+        console.error('Element to capture not found!');
+        return;
+      }
+
       const canvas = await html2canvas(element, {
-        backgroundColor: '#000000',
+        logging: true,
         useCORS: true,
-        scale: 2
+        backgroundColor: '#000000',
+        scale: 2,
+        onclone: (clonedDoc) => {
+          const clonedElement = clonedDoc.getElementById('wrap');
+          if (clonedElement) {
+            clonedElement.style.backgroundColor = '#000000';
+          }
+        }
       });
-      
-      const image = canvas.toDataURL('image/png');
+      const dataUrl = canvas.toDataURL('image/png');
+
       const link = document.createElement('a');
-      link.href = image;
-      link.download = `${params.handle}-codeforces-wrapped-2024.png`;
+      link.href = dataUrl;
+      link.download = 'wrapped_stats.png';
+      document.body.appendChild(link);
       link.click();
+      document.body.removeChild(link);
     } catch (error) {
-      console.error('Error generating image:', error);
+      console.error('Failed to capture or download the image:', error);
     }
   };
 
@@ -149,7 +161,13 @@ export default function WrappedPage({ params }: { params: { handle: string } }) 
       const canvas = await html2canvas(element, {
         backgroundColor: '#000000',
         useCORS: true,
-        scale: 2
+        scale: 2,
+        onclone: (clonedDoc) => {
+          const clonedElement = clonedDoc.getElementById('wrap');
+          if (clonedElement) {
+            clonedElement.style.backgroundColor = '#000000';
+          }
+        }
       });
       
       canvas.toBlob(async (blob) => {
@@ -187,6 +205,31 @@ export default function WrappedPage({ params }: { params: { handle: string } }) 
     }
   };
 
+  const handleDownloadSummary = () => {
+    if (stats) {
+      const summary = {
+        username: params.handle,
+        totalSolved: stats.totalSolved,
+        maxRating: stats.maxRating,
+        currentRating: stats.currentRating,
+        mostActiveDay: stats.mostActiveDay,
+        mostActiveMonth: stats.mostActiveMonth,
+        problemsSolved: stats.problemsSolved,
+        topLanguage: stats.topLanguage,
+      };
+
+      const blob = new Blob([JSON.stringify(summary, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${params.handle}-github-summary.json`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-black">
@@ -219,17 +262,20 @@ export default function WrappedPage({ params }: { params: { handle: string } }) 
 
   return (
     <div className="min-h-screen bg-black text-white p-8">
-      <div ref={wrapperRef} className="max-w-3xl mx-auto space-y-8">
+      {/* Wrap everything that should be captured in a div with id="wrap" */}
+      <div id="wrap" className="max-w-3xl mx-auto space-y-8 bg-black">
         {/* Header */}
         <div className="text-center space-y-4 mb-8">
           <div className="w-28 h-28 mx-auto rounded-full overflow-hidden bg-gray-800 relative">
-            {stats?.handle && (
-              <img
-                src={getRandomAvatar(stats.handle)}
-                alt={`${stats?.handle}'s avatar`}
+            {stats?.profilePicture ? (
+              <Image
+                src={stats.profilePicture}
+                alt={`${stats.handle}'s profile`}
+                width={112}
+                height={112}
                 className="w-full h-full object-cover"
                 onError={(e) => {
-                  // Fallback to a simple colored div with initials if image fails
+                  // Fallback to initials if image fails to load
                   const target = e.target as HTMLImageElement;
                   target.style.display = 'none';
                   target.parentElement!.style.backgroundColor = '#6366f1';
@@ -240,6 +286,11 @@ export default function WrappedPage({ params }: { params: { handle: string } }) 
                   `;
                 }}
               />
+            ) : (
+              // Fallback to initials if no profile picture
+              <div className="w-full h-full flex items-center justify-center text-2xl font-bold text-white bg-[#6366f1]">
+                {stats?.handle.substring(0, 2).toUpperCase()}
+              </div>
             )}
           </div>
           <h1 className="text-4xl font-bold">@{stats?.handle}</h1>
@@ -247,30 +298,13 @@ export default function WrappedPage({ params }: { params: { handle: string } }) 
         </div>
 
         {/* Contribution Graph */}
-        <Card className="bg-gray-900 p-6 rounded-xl">
-          <div className="space-y-4 max-w-full overflow-hidden">
+        <Card className="bg-[#0d1117] p-6 rounded-xl hover:bg-[#161b22] transition-all duration-300">
+          <div className="space-y-4">
             {stats && (
               <>
-                {/* Month Labels */}
-                <div className="relative w-full overflow-x-auto">
-                  <div className="flex min-w-full px-1">
-                    {getMonthLabels(formatContributionData(stats.contributionData)).map((label, index) => (
-                      <div
-                        key={index}
-                        className="text-xs text-gray-400 absolute"
-                        style={{
-                          left: `${(label.index * 16)}px`, // 16px = cell width (12px) + gap (4px)
-                        }}
-                      >
-                        {label.text}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Contribution Grid */}
-                <div className="relative w-full overflow-x-auto">
-                  <div className="flex gap-1 min-w-full py-1">
+                {/* Contribution Grid - removed month labels section */}
+                <div className="relative w-full overflow-hidden">
+                  <div className="flex gap-1 py-1">
                     {formatContributionData(stats.contributionData).map((week, weekIndex) => (
                       <div key={weekIndex} className="grid grid-rows-7 gap-1">
                         {week.map((day, dayIndex) => (
@@ -403,32 +437,41 @@ export default function WrappedPage({ params }: { params: { handle: string } }) 
           </div>
         </Card>
 
-        {/* Footer */}
-        <div className="text-center text-gray-500 pt-8">
-          <a href="/" className="hover:text-gray-400 transition-colors">
-            codeforces-wrapped.com
-          </a>
+        {/* Credits section - keep this inside the wrap div */}
+        <div className="relative mt-12 pb-8">
+          <div className="text-center">
+            <div className="flex justify-center items-center space-x-8 text-sm text-gray-500">
+              <Link
+                href="https://github.com/kunallll17"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-gray-400 hover:text-purple-300 transition-colors"
+              >
+                Created by @kunallll17
+              </Link>
+            </div>
+          </div>
         </div>
+      </div>
 
-        {/* Buttons - outside the content to be captured */}
-        <div className="flex justify-center gap-4 mt-8">
-          <Button
-            onClick={downloadImage}
-            className="flex items-center gap-2 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 
-            transform hover:scale-105 transition-all duration-200 px-6 py-3 rounded-lg shadow-lg hover:shadow-xl"
-          >
-            <Download className="w-5 h-5 animate-bounce" />
-            <span className="font-semibold">Download Wrap</span>
-          </Button>
-          <Button
-            onClick={shareImage}
-            className="flex items-center gap-2 bg-gradient-to-r from-green-500 to-teal-500 hover:from-green-600 hover:to-teal-600 
-            transform hover:scale-105 transition-all duration-200 px-6 py-3 rounded-lg shadow-lg hover:shadow-xl"
-          >
-            <Share2 className="w-5 h-5 group-hover:rotate-12 transition-transform duration-200" />
-            <span className="font-semibold">Share Wrap</span>
-          </Button>
-        </div>
+      {/* Buttons - moved outside the wrap div */}
+      <div className="flex justify-center gap-4 mt-8">
+        <Button
+          onClick={downloadImage}
+          className="flex items-center gap-2 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 
+          transform hover:scale-105 transition-all duration-200 px-6 py-3 rounded-lg shadow-lg hover:shadow-xl"
+        >
+          <Download className="w-5 h-5 animate-bounce" />
+          <span className="font-semibold">Download Wrap</span>
+        </Button>
+        <Button
+          onClick={shareImage}
+          className="flex items-center gap-2 bg-gradient-to-r from-green-500 to-teal-500 hover:from-green-600 hover:to-teal-600 
+          transform hover:scale-105 transition-all duration-200 px-6 py-3 rounded-lg shadow-lg hover:shadow-xl"
+        >
+          <Share2 className="w-5 h-5 group-hover:rotate-12 transition-transform duration-200" />
+          <span className="font-semibold">Share Wrap</span>
+        </Button>
       </div>
     </div>
   );
