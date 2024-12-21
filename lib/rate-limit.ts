@@ -15,14 +15,17 @@ export async function checkRateLimit(ip: string) {
   const now = Date.now();
   const windowStart = now - RATE_LIMIT.windowMs;
 
-  // Convert windowStart to string for zremrangebyscore
-  const requests = await redis.zremrangebyscore(key, windowStart.toString(), '+inf');
+  // Use numbers directly for Redis operations
+  const requests = await redis.zrangebyscore(key, windowStart, now);
   
   if (requests.length >= RATE_LIMIT.maxRequests) {
     return { success: false };
   }
 
-  await redis.zadd(key, now, now.toString());
+  // Add the new request timestamp
+  await redis.zadd(key, { score: now, member: now.toString() });
+  
+  // Set expiration
   await redis.expire(key, Math.floor(RATE_LIMIT.windowMs / 1000));
 
   return { success: true };
