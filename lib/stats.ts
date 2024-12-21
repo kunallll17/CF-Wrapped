@@ -1,4 +1,4 @@
-// ./lib/stats.ts
+// lib/stats.ts
 
 import { CodeforcesUser, Submission, UserStats, PowerClass } from './types';
 import { generateContributionData } from './api';
@@ -119,6 +119,77 @@ function calculateStreaks(contributionData: Record<string, number>): { current: 
   return { current, longest };
 }
 
+function calculateTopLanguage(submissions: Submission[]): string {
+  const languageCounts: Record<string, number> = {};
+  
+  submissions.forEach(submission => {
+    const lang = submission.programmingLanguage;
+    languageCounts[lang] = (languageCounts[lang] || 0) + 1;
+  });
+
+  let topLanguage = 'Unknown';
+  let maxCount = 0;
+
+  Object.entries(languageCounts).forEach(([lang, count]) => {
+    if (count > maxCount) {
+      maxCount = count;
+      topLanguage = lang;
+    }
+  });
+
+  return topLanguage;
+}
+
+function processSubmissionStats(submissions: Submission[]) {
+  const languageCount = new Map<string, number>();
+  const tagCount = new Map<string, number>();
+  
+  const thisYearSubmissions = submissions.filter(sub => {
+    const subDate = new Date(sub.creationTimeSeconds * 1000);
+    return subDate.getFullYear() === new Date().getFullYear();
+  });
+
+  thisYearSubmissions.forEach(submission => {
+    // Process programming language
+    if (submission.programmingLanguage) {
+      languageCount.set(
+        submission.programmingLanguage,
+        (languageCount.get(submission.programmingLanguage) || 0) + 1
+      );
+    }
+    
+    // Process problem tags safely
+    if (submission.problem.tags && Array.isArray(submission.problem.tags)) {
+      submission.problem.tags.forEach(tag => {
+        tagCount.set(tag, (tagCount.get(tag) || 0) + 1);
+      });
+    }
+  });
+
+  // Get top language
+  let topLanguage = 'Unknown';
+  let maxLangCount = 0;
+  languageCount.forEach((count, lang) => {
+    if (count > maxLangCount) {
+      maxLangCount = count;
+      topLanguage = lang;
+    }
+  });
+
+  // Get top tags
+  const topTags = Array.from(tagCount.entries())
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 5)
+    .map(([tag]) => tag);
+
+  return {
+    topLanguage,
+    topTags,
+    languageStats: Object.fromEntries(languageCount),
+    tagStats: Object.fromEntries(tagCount)
+  };
+}
+
 // Main Function
 
 export async function processUserStats(
@@ -180,6 +251,16 @@ export async function processUserStats(
     acceptedSubmissions: acceptedSubmissions.length
   });
   
+  const submissionStats = processSubmissionStats(submissions);
+
+  const ratingProgression = thisYearSubmissions
+    .filter(s => s.verdict === 'OK' && s.problem.rating !== undefined)
+    .map(s => ({
+      date: new Date(s.creationTimeSeconds * 1000).toISOString().split('T')[0],
+      rating: s.problem.rating || 0
+    }))
+    .sort((a, b) => a.date.localeCompare(b.date));
+
   return {
     handle: user.handle,
     totalSubmissions: Object.values(contributionData).reduce((a, b) => a + b, 0),
@@ -188,18 +269,12 @@ export async function processUserStats(
     longestStreak: streaks.longest,
     mostActiveMonth,
     mostActiveDay: mostActiveDate,
-    topLanguage: Array.from(languageCount.entries())
-      .sort((a, b) => b[1] - a[1])[0]?.[0] || '',
-    languageDistribution: Object.fromEntries(languageCount),
-    tagDistribution: Object.fromEntries(tagCount),
     contributionData,
-    ratingProgression: thisYearSubmissions
-      .filter(s => s.verdict === 'OK')
-      .map(s => ({
-        date: new Date(s.creationTimeSeconds * 1000).toISOString().split('T')[0],
-        rating: s.problem.rating || 0
-      }))
-      .sort((a, b) => a.date.localeCompare(b.date)),
+    ratingProgression,
+    topLanguage: submissionStats.topLanguage,
+    topTags: submissionStats.topTags,
+    languageStats: submissionStats.languageStats,
+    tagStats: submissionStats.tagStats,
     lastUpdated: new Date(),
     powerClass,
   };

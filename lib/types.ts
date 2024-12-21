@@ -11,13 +11,20 @@ export interface Submission {
   id: number;
   contestId?: number;
   creationTimeSeconds: number;
+  programmingLanguage: string;
   verdict: string;
   problem: {
     contestId?: number;
     index: string;
     name: string;
     rating?: number;
+    tags: string[];
   };
+}
+
+interface RatingPoint {
+  date: string;
+  rating: number;
 }
 
 export interface UserStats {
@@ -34,9 +41,21 @@ export interface UserStats {
     color: string;
     description: string;
   };
+  topLanguage: string;
+  topTags: string[];
+  languageStats: Record<string, number>;
+  tagStats: Record<string, number>;
+  ratingProgression: RatingPoint[];
+  lastUpdated: Date;
 }
 
 export interface ApiError {
   status: number;
   message: string;
+}
+
+export interface PowerClass {
+  title: string;
+  color: string;
+  description: string;
 }
