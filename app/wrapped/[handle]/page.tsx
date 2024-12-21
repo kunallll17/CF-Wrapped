@@ -374,6 +374,35 @@ export default function WrappedPage({ params }: { params: { handle: string } }) 
           </Card>
         </div>
 
+        {/* Power Level Card */}
+        <Card className="bg-gray-900 p-6 rounded-xl">
+          <div className="space-y-4 text-center">
+            <div className="text-gray-400 text-sm">POWER LEVEL</div>
+            <div className={`text-4xl font-bold ${stats?.powerClass.color} transition-all duration-300 hover:scale-105`}>
+              {stats?.powerClass.title}
+            </div>
+            <div className="text-gray-400 text-sm">
+              {stats?.powerClass.description}
+            </div>
+            
+            {/* Power Level Progress */}
+            <div className="mt-4 space-y-2">
+              <div className="flex justify-between text-xs text-gray-400">
+                <span>Next Level:</span>
+                <span>
+                  {stats && stats.totalSubmissions < 100 ? '100 submissions' :
+                   stats?.totalSubmissions < 500 ? '500 submissions' :
+                   stats?.totalSubmissions < 1000 ? '1000 submissions' :
+                   stats?.totalSubmissions < 2000 ? '2000 submissions' :
+                   stats?.totalSubmissions < 4000 ? '4000 submissions' :
+                   stats?.totalSubmissions < 9000 ? '9000 submissions' :
+                   'MAX LEVEL ACHIEVED! 🎉'}
+                </span>
+              </div>
+            </div>
+          </div>
+        </Card>
+
         {/* Footer */}
         <div className="text-center text-gray-500 pt-8">
           <a href="/" className="hover:text-gray-400 transition-colors">

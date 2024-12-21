@@ -1,5 +1,9 @@
-import { CodeforcesUser, Submission, UserStats } from './types';
+// ./lib/stats.ts
+
+import { CodeforcesUser, Submission, UserStats, PowerClass } from './types';
 import { generateContributionData } from './api';
+
+// Utility Functions
 
 function calculatePercentileRank(rating: number): number {
   // Codeforces rating distribution approximation
@@ -36,144 +40,52 @@ function calculatePowerLevel(stats: {
   totalSubmissions: number;
   acceptedSubmissions: number;
 }): PowerClass {
-  // Convert rank percentage to number
-  const rankPercentage = getRankPercentage(stats.universalRank);
-  
-  // Rest of the calculation remains same
-  const submissionScore = Math.min(100, (stats.totalSubmissions / 1000) * 100);
-  const accuracyScore = (stats.acceptedSubmissions / stats.totalSubmissions) * 100;
-  
-  const powerScore = (
-    rankPercentage * 0.5 +
-    submissionScore * 0.3 +
-    accuracyScore * 0.2
-  );
+  // Calculate based primarily on total submissions
+  const submissions = stats.totalSubmissions;
 
-  // Power class definitions remain same...
-  if (powerScore <= 5) {
+  if (submissions >= 9000) {
     return {
-      title: "LEGENDARY",
+      title: "GOD MODE ⚡",
       color: "text-yellow-400",
-      description: "Among the elite competitive programmers!"
+      description: "Absolutely legendary! You've transcended mortal coding limits!"
+    };
+  } else if (submissions >= 4000) {
+    return {
+      title: "SUPER SAIYAN 🔥 💥",
+      color: "text-orange-500",
+      description: "Your power level is over 4000! Incredible mastery!"
+    };
+  } else if (submissions >= 2000) {
+    return {
+      title: "SAGE MODE 🌀",
+      color: "text-blue-400",
+      description: "You've achieved perfect harmony with the code!"
+    };
+  } else if (submissions >= 1000) {
+    return {
+      title: "ELITE CLASS ⚡",
+      color: "text-purple-500",
+      description: "Your dedication to competitive programming is outstanding!"
+    };
+  } else if (submissions >= 500) {
+    return {
+      title: "NINJA 🥷",
+      color: "text-gray-300",
+      description: "Stealthily solving problems with precision!"
+    };
+  } else if (submissions >= 100) {
+    return {
+      title: "ADVENTURER 🌊",
+      color: "text-cyan-400",
+      description: "Embarking on an epic coding journey!"
+    };
+  } else {
+    return {
+      title: "ROOKIE 🌱",
+      color: "text-green-400",
+      description: "Beginning your path to greatness!"
     };
   }
-  // ... rest of the power classes ...
-}
-
-// Update the interface to match the types
-interface UserStats {
-  handle: string;
-  totalSubmissions: number;
-  acceptedSubmissions: number;
-  universalRank: string;  // Changed to string to match calculateUniversalRank return type
-  longestStreak: number;
-  mostActiveMonth: string;
-  mostActiveDay: string;
-  contributionData: Record<string, number>;
-  powerClass: PowerClass;
-}
-
-export async function processUserStats(
-  user: CodeforcesUser,
-  submissions: Submission[]
-): Promise<UserStats> {
-  // Filter submissions for 2024 only
-  const currentYear = new Date().getFullYear();
-  const thisYearSubmissions = submissions.filter(submission => {
-    const submissionDate = new Date(submission.creationTimeSeconds * 1000);
-    return submissionDate.getFullYear() === currentYear;
-  });
-
-  // Generate contribution data from submissions
-  const contributionData = generateContributionData(submissions);
-  
-  // Calculate correct universal rank
-  const rankPercentile = calculateRankPercentile(user.rating);
-  
-  const acceptedSubmissions = thisYearSubmissions.filter(s => s.verdict === 'OK');
-  
-  // Process languages
-  const languageCount = new Map<string, number>();
-  const tagCount = new Map<string, number>();
-  
-  thisYearSubmissions.forEach(submission => {
-    languageCount.set(
-      submission.programmingLanguage,
-      (languageCount.get(submission.programmingLanguage) || 0) + 1
-    );
-    
-    submission.problem.tags.forEach(tag => {
-      tagCount.set(tag, (tagCount.get(tag) || 0) + 1);
-    });
-  });
-
-  // Calculate streaks
-  const streaks = calculateStreaks(contributionData);
-  
-  // Find most active month/day
-  const submissionsByDate = new Map(Object.entries(contributionData));
-  const mostActiveDate = Array.from(submissionsByDate.entries())
-    .reduce((a, b) => (a[1] > b[1] ? a : b))[0];
-
-  const monthlySubmissions = new Map<string, number>();
-  Object.entries(contributionData).forEach(([date, count]) => {
-    const month = date.substring(0, 7);
-    monthlySubmissions.set(month, (monthlySubmissions.get(month) || 0) + count);
-  });
-
-  const mostActiveMonth = Array.from(monthlySubmissions.entries())
-    .reduce((a, b) => (a[1] > b[1] ? a : b))[0];
-
-  const powerClass = calculatePowerLevel({
-    universalRank: calculateUniversalRank(user.rating),
-    totalSubmissions: Object.values(contributionData).reduce((a, b) => a + b, 0),
-    acceptedSubmissions: acceptedSubmissions.length
-  });
-
-  return {
-    handle: user.handle,
-    totalSubmissions: Object.values(contributionData).reduce((a, b) => a + b, 0),
-    acceptedSubmissions: acceptedSubmissions.length,
-    universalRank: calculateUniversalRank(user.rating),
-    longestStreak: streaks.longest,
-    mostActiveMonth,
-    mostActiveDay: mostActiveDate,
-    topLanguage: Array.from(languageCount.entries())
-      .sort((a, b) => b[1] - a[1])[0]?.[0] || '',
-    languageDistribution: Object.fromEntries(languageCount),
-    tagDistribution: Object.fromEntries(tagCount),
-    contributionData,
-    ratingProgression: thisYearSubmissions
-      .filter(s => s.verdict === 'OK')
-      .map(s => ({
-        date: new Date(s.creationTimeSeconds * 1000).toISOString().split('T')[0],
-        rating: s.problem.rating || 0
-      }))
-      .sort((a, b) => a.date.localeCompare(b.date)),
-    lastUpdated: new Date(),
-    powerClass,
-  };
-}
-
-function calculateRankPercentile(rating: number): number {
-  // Codeforces rating distribution (approximate)
-  const distributions = [
-    { rating: 3000, percentile: 0.1 },
-    { rating: 2400, percentile: 1 },
-    { rating: 2100, percentile: 5 },
-    { rating: 1900, percentile: 10 },
-    { rating: 1600, percentile: 20 },
-    { rating: 1400, percentile: 50 },
-    { rating: 1200, percentile: 70 },
-    { rating: 1000, percentile: 90 },
-  ];
-  
-  for (const dist of distributions) {
-    if (rating >= dist.rating) {
-      return dist.percentile;
-    }
-  }
-  return 100;
 }
 
 function calculateStreaks(contributionData: Record<string, number>): { current: number; longest: number } {
@@ -205,4 +117,90 @@ function calculateStreaks(contributionData: Record<string, number>): { current: 
   }
 
   return { current, longest };
+}
+
+// Main Function
+
+export async function processUserStats(
+  user: CodeforcesUser,
+  submissions: Submission[]
+): Promise<UserStats> {
+  // Filter submissions for the current year
+  const currentYear = new Date().getFullYear();
+  const thisYearSubmissions = submissions.filter(submission => {
+    const submissionDate = new Date(submission.creationTimeSeconds * 1000);
+    return submissionDate.getFullYear() === currentYear;
+  });
+
+  // Generate contribution data from submissions
+  const contributionData = generateContributionData(submissions);
+  
+  // Calculate universal rank
+  const rankPercentile = calculatePercentileRank(user.rating);
+  
+  const acceptedSubmissions = thisYearSubmissions.filter(s => s.verdict === 'OK');
+  
+  // Process languages and tags
+  const languageCount = new Map<string, number>();
+  const tagCount = new Map<string, number>();
+  
+  thisYearSubmissions.forEach(submission => {
+    languageCount.set(
+      submission.programmingLanguage,
+      (languageCount.get(submission.programmingLanguage) || 0) + 1
+    );
+    
+    submission.problem.tags.forEach(tag => {
+      tagCount.set(tag, (tagCount.get(tag) || 0) + 1);
+    });
+  });
+
+  // Calculate streaks
+  const streaks = calculateStreaks(contributionData);
+  
+  // Find most active day
+  const submissionsByDate = new Map(Object.entries(contributionData));
+  const mostActiveDate = Array.from(submissionsByDate.entries())
+    .reduce((a, b) => (a[1] > b[1] ? a : b))[0];
+  
+  // Find most active month
+  const monthlySubmissions = new Map<string, number>();
+  Object.entries(contributionData).forEach(([date, count]) => {
+    const month = date.substring(0, 7); // Format: YYYY-MM
+    monthlySubmissions.set(month, (monthlySubmissions.get(month) || 0) + count);
+  });
+  
+  const mostActiveMonth = Array.from(monthlySubmissions.entries())
+    .reduce((a, b) => (a[1] > b[1] ? a : b))[0];
+  
+  // Calculate power class
+  const powerClass = calculatePowerLevel({
+    universalRank: calculateUniversalRank(user.rating),
+    totalSubmissions: Object.values(contributionData).reduce((a, b) => a + b, 0),
+    acceptedSubmissions: acceptedSubmissions.length
+  });
+  
+  return {
+    handle: user.handle,
+    totalSubmissions: Object.values(contributionData).reduce((a, b) => a + b, 0),
+    acceptedSubmissions: acceptedSubmissions.length,
+    universalRank: calculateUniversalRank(user.rating),
+    longestStreak: streaks.longest,
+    mostActiveMonth,
+    mostActiveDay: mostActiveDate,
+    topLanguage: Array.from(languageCount.entries())
+      .sort((a, b) => b[1] - a[1])[0]?.[0] || '',
+    languageDistribution: Object.fromEntries(languageCount),
+    tagDistribution: Object.fromEntries(tagCount),
+    contributionData,
+    ratingProgression: thisYearSubmissions
+      .filter(s => s.verdict === 'OK')
+      .map(s => ({
+        date: new Date(s.creationTimeSeconds * 1000).toISOString().split('T')[0],
+        rating: s.problem.rating || 0
+      }))
+      .sort((a, b) => a.date.localeCompare(b.date)),
+    lastUpdated: new Date(),
+    powerClass,
+  };
 }
