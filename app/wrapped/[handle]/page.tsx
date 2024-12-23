@@ -371,96 +371,96 @@ export default function WrappedPage({ params }: { params: { handle: string } }) 
         {/* Stats Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {/* Current Rating */}
-          <Card className="bg-[#162321] p-6 rounded-xl">
-            <div className="flex items-center gap-2 text-gray-400 mb-2">
-              <Trophy className="text-yellow-400" />
-              <span>Current Rating</span>
+          <Card className="bg-[#162321] p-6 rounded-xl transform transition-all duration-300 hover:scale-105 hover:shadow-xl hover:bg-[#1c2c28]">
+            <div className="flex items-center gap-2 text-gray-400 mb-2 group">
+              <Trophy className="text-yellow-400 transition-transform duration-300 group-hover:scale-110 group-hover:rotate-12" />
+              <span className="transition-colors duration-300 group-hover:text-yellow-400">Current Rating</span>
             </div>
-            <div className={`text-2xl font-bold ${stats?.rating?.currentColor || 'text-gray-500'}`}>
+            <div className={`text-2xl font-bold ${stats?.rating?.currentColor || 'text-gray-500'} transition-all duration-300 hover:scale-105`}>
               {stats?.rating?.current || 'Unrated'}
             </div>
-            <div className={`text-sm ${stats?.rating?.currentColor || 'text-gray-500'}`}>
+            <div className={`text-sm ${stats?.rating?.currentColor || 'text-gray-500'} transition-all duration-300 hover:scale-105`}>
               {stats?.rating?.currentRank || 'Unrated'}
             </div>
           </Card>
 
           {/* Max Rating */}
-          <Card className="bg-[#2d2215] p-6 rounded-xl">
-            <div className="flex items-center gap-2 text-gray-400 mb-2">
-              <Crown className="text-orange-400" />
-              <span>Highest Rating</span>
+          <Card className="bg-[#2d2215] p-6 rounded-xl transform transition-all duration-300 hover:scale-105 hover:shadow-xl hover:bg-[#382a1a]">
+            <div className="flex items-center gap-2 text-gray-400 mb-2 group">
+              <Crown className="text-orange-400 transition-transform duration-300 group-hover:scale-110 group-hover:rotate-12" />
+              <span className="transition-colors duration-300 group-hover:text-orange-400">Highest Rating</span>
             </div>
-            <div className={`text-2xl font-bold ${stats?.rating?.maxColor || 'text-gray-500'}`}>
+            <div className={`text-2xl font-bold ${stats?.rating?.maxColor || 'text-gray-500'} transition-all duration-300 hover:scale-105`}>
               {stats?.rating?.maxRating || 'Unrated'}
             </div>
-            <div className={`text-sm ${stats?.rating?.maxColor || 'text-gray-500'}`}>
+            <div className={`text-sm ${stats?.rating?.maxColor || 'text-gray-500'} transition-all duration-300 hover:scale-105`}>
               {stats?.rating?.maxRank || 'Unrated'}
             </div>
           </Card>
 
           {/* Universal Rank */}
-          <Card className="bg-[#2d2215] p-6 rounded-xl">
-            <div className="flex items-center gap-2 text-gray-400 mb-2">
-              <Crown className="text-yellow-500" />
-              <span>Universal Rank</span>
+          <Card className="bg-[#2d2215] p-6 rounded-xl transform transition-all duration-300 hover:scale-105 hover:shadow-xl hover:bg-[#382a1a]">
+            <div className="flex items-center gap-2 text-gray-400 mb-2 group">
+              <Crown className="text-yellow-500 transition-transform duration-300 group-hover:scale-110 group-hover:rotate-12" />
+              <span className="transition-colors duration-300 group-hover:text-yellow-500">Universal Rank</span>
             </div>
-            <div className="text-yellow-500 text-2xl font-bold">
-              Top {stats.universalRank}%
+            <div className="text-yellow-500 text-2xl font-bold transition-all duration-300 hover:scale-105">
+              Top {stats?.universalRank}%
             </div>
           </Card>
 
           {/* Longest Streak */}
-          <Card className="bg-[#231f2e] p-6 rounded-xl">
-            <div className="flex items-center gap-2 text-gray-400 mb-2">
-              <Zap className="text-purple-400" />
-              <span>Longest Streak</span>
+          <Card className="bg-[#231f2e] p-6 rounded-xl transform transition-all duration-300 hover:scale-105 hover:shadow-xl hover:bg-[#2d2839]">
+            <div className="flex items-center gap-2 text-gray-400 mb-2 group">
+              <Zap className="text-purple-400 transition-transform duration-300 group-hover:scale-110 group-hover:rotate-12" />
+              <span className="transition-colors duration-300 group-hover:text-purple-400">Longest Streak</span>
             </div>
-            <div className="text-purple-400 text-2xl font-bold">
-              {stats.longestStreak} days
+            <div className="text-purple-400 text-2xl font-bold transition-all duration-300 hover:scale-105">
+              {stats?.longestStreak} days
             </div>
           </Card>
 
           {/* Total Submissions */}
-          <Card className="bg-[#162321] p-6 rounded-xl">
-            <div className="flex items-center gap-2 text-gray-400 mb-2">
-              <Trophy className="text-emerald-400" />
-              <span>Total Submissions</span>
+          <Card className="bg-[#162321] p-6 rounded-xl transform transition-all duration-300 hover:scale-105 hover:shadow-xl hover:bg-[#1c2c28]">
+            <div className="flex items-center gap-2 text-gray-400 mb-2 group">
+              <Trophy className="text-emerald-400 transition-transform duration-300 group-hover:scale-110 group-hover:rotate-12" />
+              <span className="transition-colors duration-300 group-hover:text-emerald-400">Total Submissions</span>
             </div>
-            <div className="text-emerald-400 text-2xl font-bold">
-              {stats.totalSubmissions.toLocaleString()}
+            <div className="text-emerald-400 text-2xl font-bold transition-all duration-300 hover:scale-105">
+              {stats?.totalSubmissions.toLocaleString()}
             </div>
           </Card>
 
           {/* Most Active Month */}
-          <Card className="bg-[#2d2215] p-6 rounded-xl">
-            <div className="flex items-center gap-2 text-gray-400 mb-2">
-              <Calendar className="text-orange-400" />
-              <span>Most Active Month</span>
+          <Card className="bg-[#2d2215] p-6 rounded-xl transform transition-all duration-300 hover:scale-105 hover:shadow-xl hover:bg-[#382a1a]">
+            <div className="flex items-center gap-2 text-gray-400 mb-2 group">
+              <Calendar className="text-orange-400 transition-transform duration-300 group-hover:scale-110 group-hover:rotate-12" />
+              <span className="transition-colors duration-300 group-hover:text-orange-400">Most Active Month</span>
             </div>
-            <div className="text-orange-400 text-2xl font-bold">
-              Top {stats.mostActiveMonth}
+            <div className="text-orange-400 text-2xl font-bold transition-all duration-300 hover:scale-105">
+              {stats?.mostActiveMonth}
             </div>
           </Card>
 
           {/* Most Active Day */}
-          <Card className="bg-[#162321] p-6 rounded-xl">
-            <div className="flex items-center gap-2 text-gray-400 mb-2">
-              <CalendarDays className="text-cyan-400" />
-              <span>Most Active Day</span>
+          <Card className="bg-[#162321] p-6 rounded-xl transform transition-all duration-300 hover:scale-105 hover:shadow-xl hover:bg-[#1c2c28]">
+            <div className="flex items-center gap-2 text-gray-400 mb-2 group">
+              <CalendarDays className="text-cyan-400 transition-transform duration-300 group-hover:scale-110 group-hover:rotate-12" />
+              <span className="transition-colors duration-300 group-hover:text-cyan-400">Most Active Day</span>
             </div>
-            <div className="text-cyan-400 text-2xl font-bold">
-              {stats.mostActiveDay}
+            <div className="text-cyan-400 text-2xl font-bold transition-all duration-300 hover:scale-105">
+              {stats?.mostActiveDay}
             </div>
           </Card>
 
           {/* Top Language */}
-          <Card className="bg-[#2d1f2e] p-6 rounded-xl">
-            <div className="flex items-center gap-2 text-gray-400 mb-2">
-              <Code2 className="text-pink-400" />
-              <span>Top Language</span>
+          <Card className="bg-[#2d1f2e] p-6 rounded-xl transform transition-all duration-300 hover:scale-105 hover:shadow-xl hover:bg-[#382639]">
+            <div className="flex items-center gap-2 text-gray-400 mb-2 group">
+              <Code2 className="text-pink-400 transition-transform duration-300 group-hover:scale-110 group-hover:rotate-12" />
+              <span className="transition-colors duration-300 group-hover:text-pink-400">Top Language</span>
             </div>
-            <div className="text-pink-400 text-2xl font-bold">
-              {stats.topLanguage}
+            <div className="text-pink-400 text-2xl font-bold transition-all duration-300 hover:scale-105">
+              {stats?.topLanguage}
             </div>
           </Card>
         </div>
