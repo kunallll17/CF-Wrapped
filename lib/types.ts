@@ -28,10 +28,9 @@ interface RatingPoint {
 }
 
 export interface UserStats {
-  totalSolved: any;
-  problemsSolved: any;
   handle: string;
   totalSubmissions: number;
+  acceptedSubmissions: number;
   mostActiveDay: string;
   mostActiveMonth: string;
   topLanguage: string;
@@ -45,14 +44,21 @@ export interface UserStats {
   contributionData: Record<string, number>;
   profilePicture: string;
   rating: {
-    currentRating: any;
     current: number;
     maxRating: number;
+    currentRating: number;
     currentRank: string;
     maxRank: string;
     currentColor: string;
     maxColor: string;
   };
+  problemsSolved: number;
+  totalSolved: number;
+  topTags: string[];
+  languageStats: Record<string, number>;
+  tagStats: Record<string, number>;
+  lastUpdated: Date;
+  ratingProgression: RatingPoint[];
 }
 
 export interface ApiError {

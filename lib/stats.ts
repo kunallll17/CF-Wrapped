@@ -5,6 +5,20 @@ import { generateContributionData } from './api';
 
 // Utility Functions
 
+function getRankAndColor(rating: number): { rank: string; color: string } {
+  if (rating === 0) return { rank: 'Unrated', color: 'text-gray-500' };
+  if (rating < 1200) return { rank: 'Newbie', color: 'text-gray-500' };
+  if (rating < 1400) return { rank: 'Pupil', color: 'text-green-500' };
+  if (rating < 1600) return { rank: 'Specialist', color: 'text-cyan-500' };
+  if (rating < 1900) return { rank: 'Expert', color: 'text-blue-500' };
+  if (rating < 2100) return { rank: 'Candidate Master', color: 'text-purple-500' };
+  if (rating < 2300) return { rank: 'Master', color: 'text-[#FFA500]' };
+  if (rating < 2400) return { rank: 'International Master', color: 'text-[#FFA500]' };
+  if (rating < 2600) return { rank: 'Grandmaster', color: 'text-[#FF0000]' };
+  if (rating < 3000) return { rank: 'International Grandmaster', color: 'text-[#FF0000]' };
+  return { rank: 'Legendary Grandmaster', color: 'text-[#FF0000]' };
+}
+
 function calculatePercentileRank(rating: number): number {
   // Codeforces rating distribution approximation
   const maxRating = 3800; // Highest possible rating
@@ -14,20 +28,20 @@ function calculatePercentileRank(rating: number): number {
   return Math.round((1 - (currentRating / maxRating)) * 100);
 }
 
-function calculateUniversalRank(rating: number): string {
-  if (rating === 0) return "Unrated";
+function calculateUniversalRank(rating: number): number {
+  if (rating === 0) return 100;
   
   // Codeforces uses these thresholds for ranks
-  if (rating >= 3000) return "0.1"; // Legendary Grandmaster
-  if (rating >= 2600) return "0.3"; // International Grandmaster
-  if (rating >= 2400) return "1";   // Grandmaster
-  if (rating >= 2300) return "2";   // International Master
-  if (rating >= 2100) return "5";   // Master
-  if (rating >= 1900) return "10";  // Candidate Master
-  if (rating >= 1600) return "20";  // Expert
-  if (rating >= 1400) return "50";  // Specialist
-  if (rating >= 1200) return "70";  // Pupil
-  return "100";                     // Newbie
+  if (rating >= 3000) return 0.1;  // Legendary Grandmaster
+  if (rating >= 2600) return 0.3;  // International Grandmaster
+  if (rating >= 2400) return 1;    // Grandmaster
+  if (rating >= 2300) return 2;    // International Master
+  if (rating >= 2100) return 5;    // Master
+  if (rating >= 1900) return 10;   // Candidate Master
+  if (rating >= 1600) return 20;   // Expert
+  if (rating >= 1400) return 50;   // Specialist
+  if (rating >= 1200) return 70;   // Pupil
+  return 100;                      // Newbie
 }
 
 // Helper function to convert rank string to number
@@ -36,7 +50,7 @@ function getRankPercentage(rank: string): number {
 }
 
 function calculatePowerLevel(stats: {
-  universalRank: string;
+  universalRank: number;
   totalSubmissions: number;
   acceptedSubmissions: number;
 }): PowerClass {
@@ -280,8 +294,13 @@ export async function processUserStats(
     lastUpdated: new Date(),
     powerClass,
     rating: {
+      current: user.rating,
       maxRating: user.maxRating,
-      currentRating: user.rating
+      currentRating: user.rating,
+      currentRank: getRankAndColor(user.rating).rank,
+      maxRank: getRankAndColor(user.maxRating).rank,
+      currentColor: getRankAndColor(user.rating).color,
+      maxColor: getRankAndColor(user.maxRating).color
     },
     profilePicture: ''
   };
