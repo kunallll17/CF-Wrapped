@@ -24,3 +24,5 @@ A beautiful visualization of your competitive programming journey on Codeforces 
 - **Icons**: Lucide React
 - **Analytics**: Vercel Analytics
 - **Deployment**: Vercel/GitHub Pages
+
+You can visit the project at : https://cf-wrapped.vercel.app/
