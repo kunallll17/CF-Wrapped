@@ -46,10 +46,10 @@ export default function Home() {
 
   const featuredUsers = [
     { handle: "tourist", description: "Legendary Competitive Programmer" },
-    { handle: "Petr", description: "Creator of many CF problems" },
-    { handle: "ecnerwala", description: "ICPC World Finalist" },
-    { handle: "Um_nik", description: "Competitive Programming Expert" },
-    { handle: "Benq", description: "USACO Guide Contributor" },
+    { handle: "cry", description: "Red Coder & Problem Setter" },
+    { handle: "jiangly", description: "Competitive Programming Expert" },
+    { handle: "aryanc403", description: "ICPC World Finalist" },
+    { handle: "MridulAhi", description: "Expert Problem Solver" },
     { handle: "Dominater069", description: "Top Competitive Programmer" },
   ];
 
