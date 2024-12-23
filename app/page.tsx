@@ -176,7 +176,7 @@ export default function Home() {
               rel="noopener noreferrer"
               className="text-gray-400 hover:text-white transition-colors"
             >
-              Created by @kunallll17
+              Created by @kunallll17 🇮🇳
             </Link>
 
             <Link
