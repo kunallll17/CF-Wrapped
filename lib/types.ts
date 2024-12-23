@@ -28,31 +28,30 @@ interface RatingPoint {
 }
 
 export interface UserStats {
-  problemsSolved: any;
   totalSolved: any;
+  problemsSolved: any;
   handle: string;
   totalSubmissions: number;
-  acceptedSubmissions: number;
-  universalRank: string;
-  longestStreak: number;
-  mostActiveMonth: string;
   mostActiveDay: string;
-  contributionData: Record<string, number>;
+  mostActiveMonth: string;
+  topLanguage: string;
   powerClass: {
     title: string;
-    color: string;
     description: string;
+    color: string;
   };
-  topLanguage: string;
-  topTags: string[];
-  languageStats: Record<string, number>;
-  tagStats: Record<string, number>;
-  ratingProgression: RatingPoint[];
-  lastUpdated: Date;
+  universalRank: number;
+  longestStreak: number;
+  contributionData: Record<string, number>;
   profilePicture: string;
-  rating?: {
+  rating: {
+    currentRating: any;
+    current: number;
     maxRating: number;
-    currentRating: number;
+    currentRank: string;
+    maxRank: string;
+    currentColor: string;
+    maxColor: string;
   };
 }
 

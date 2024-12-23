@@ -106,6 +106,7 @@ export default function WrappedPage({ params }: { params: { handle: string } }) 
           throw new Error(data.error || 'Failed to fetch stats');
         }
         
+        console.log('Fetched stats:', data);
         setStats(data);
       } catch (error: any) {
         console.error('Failed to fetch stats:', error);
@@ -292,19 +293,30 @@ export default function WrappedPage({ params }: { params: { handle: string } }) 
                 height={112}
                 className="w-full h-full object-cover"
                 onError={(e) => {
-                  // Fallback to initials if image fails to load
-                  const target = e.target as HTMLImageElement;
-                  target.style.display = 'none';
-                  target.parentElement!.style.backgroundColor = '#6366f1';
-                  target.parentElement!.innerHTML = `
-                    <div class="w-full h-full flex items-center justify-center text-2xl font-bold text-white">
-                      ${stats.handle.substring(0, 2).toUpperCase()}
-                    </div>
-                  `;
+                  // Safely handle image error
+                  try {
+                    const target = e.target as HTMLImageElement;
+                    const parent = target.parentElement;
+                    
+                    if (parent) {
+                      // Hide the failed image
+                      target.style.display = 'none';
+                      
+                      // Update parent element
+                      parent.style.backgroundColor = '#6366f1';
+                      parent.innerHTML = `
+                        <div class="w-full h-full flex items-center justify-center text-2xl font-bold text-white">
+                          ${stats.handle.substring(0, 2).toUpperCase()}
+                        </div>
+                      `;
+                    }
+                  } catch (error) {
+                    console.error('Error handling image fallback:', error);
+                  }
                 }}
               />
             ) : (
-              // Fallback to initials if no profile picture
+              // Default fallback if no profile picture
               <div className="w-full h-full flex items-center justify-center text-2xl font-bold text-white bg-[#6366f1]">
                 {stats?.handle.substring(0, 2).toUpperCase()}
               </div>
@@ -358,6 +370,34 @@ export default function WrappedPage({ params }: { params: { handle: string } }) 
 
         {/* Stats Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {/* Current Rating */}
+          <Card className="bg-[#162321] p-6 rounded-xl">
+            <div className="flex items-center gap-2 text-gray-400 mb-2">
+              <Trophy className="text-yellow-400" />
+              <span>Current Rating</span>
+            </div>
+            <div className={`text-2xl font-bold ${stats?.rating?.currentColor || 'text-gray-500'}`}>
+              {stats?.rating?.current || 'Unrated'}
+            </div>
+            <div className={`text-sm ${stats?.rating?.currentColor || 'text-gray-500'}`}>
+              {stats?.rating?.currentRank || 'Unrated'}
+            </div>
+          </Card>
+
+          {/* Max Rating */}
+          <Card className="bg-[#2d2215] p-6 rounded-xl">
+            <div className="flex items-center gap-2 text-gray-400 mb-2">
+              <Crown className="text-orange-400" />
+              <span>Highest Rating</span>
+            </div>
+            <div className={`text-2xl font-bold ${stats?.rating?.maxColor || 'text-gray-500'}`}>
+              {stats?.rating?.maxRating || 'Unrated'}
+            </div>
+            <div className={`text-sm ${stats?.rating?.maxColor || 'text-gray-500'}`}>
+              {stats?.rating?.maxRank || 'Unrated'}
+            </div>
+          </Card>
+
           {/* Universal Rank */}
           <Card className="bg-[#2d2215] p-6 rounded-xl">
             <div className="flex items-center gap-2 text-gray-400 mb-2">
