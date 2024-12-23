@@ -191,8 +191,8 @@ export default function Home() {
             <button
               onClick={() => {
                 // Copy UPI ID to clipboard
-                navigator.clipboard.writeText('9351415734@ptyes');
-                alert('UPI ID copied to clipboard: 9351415734@ptyes');
+                navigator.clipboard.writeText('40488690');
+                alert('UPI ID copied to clipboard: 40488690 (It is a private UPI ID)');
               }}
               className="text-gray-400 hover:text-white transition-colors cursor-pointer"
             >
