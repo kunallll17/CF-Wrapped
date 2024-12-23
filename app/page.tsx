@@ -62,9 +62,9 @@ export default function Home() {
       image: "/jiangly.png"
     },
     { 
-      handle: "aryanc403", 
-      description: "ICPC World Finalist",
-      image: "/aryanc403.png"
+      handle: "Benq", 
+      description: "USACO Guide Contributor",
+      image: "/benq.png"
     },
     { 
       handle: "MridulAhi", 
