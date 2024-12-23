@@ -154,10 +154,13 @@ export default function WrappedPage({ params }: { params: { handle: string } }) 
   };
 
   const shareImage = async () => {
-    if (!wrapperRef.current) return;
-    
     try {
-      const element = wrapperRef.current;
+      const element = document.getElementById('wrap');
+      if (!element) {
+        console.error('Element to capture not found!');
+        return;
+      }
+
       const canvas = await html2canvas(element, {
         backgroundColor: '#000000',
         useCORS: true,
@@ -171,7 +174,10 @@ export default function WrappedPage({ params }: { params: { handle: string } }) 
       });
       
       canvas.toBlob(async (blob) => {
-        if (!blob) return;
+        if (!blob) {
+          console.error('Failed to create blob');
+          return;
+        }
         
         const filesArray = [
           new File(
@@ -181,25 +187,36 @@ export default function WrappedPage({ params }: { params: { handle: string } }) 
           )
         ];
 
-        if (navigator.share) {
-          try {
+        try {
+          if (navigator.share && navigator.canShare({ files: filesArray })) {
             await navigator.share({
               files: filesArray,
               title: 'Codeforces Wrapped 2024',
               text: `Check out my Codeforces Wrapped 2024! @${params.handle}`,
             });
-          } catch (error) {
-            console.error('Error sharing:', error);
+          } else {
+            // Fallback for browsers that don't support native sharing
+            const shareUrl = canvas.toDataURL('image/png');
+            const shareText = encodeURIComponent(`Check out my Codeforces Wrapped 2024! @${params.handle}`);
+            const shareLink = encodeURIComponent(window.location.href);
+            
+            window.open(
+              `https://twitter.com/intent/tweet?text=${shareText}&url=${shareLink}`,
+              '_blank'
+            );
           }
-        } else {
-          // Fallback for browsers that don't support native sharing
-          const shareUrl = canvas.toDataURL('image/png');
+        } catch (error) {
+          console.error('Error sharing:', error);
+          // Fallback to Twitter sharing if native sharing fails
+          const shareText = encodeURIComponent(`Check out my Codeforces Wrapped 2024! @${params.handle}`);
+          const shareLink = encodeURIComponent(window.location.href);
+          
           window.open(
-            `https://twitter.com/intent/tweet?text=Check%20out%20my%20Codeforces%20Wrapped%202024!%20@${params.handle}&url=${encodeURIComponent(window.location.href)}`,
+            `https://twitter.com/intent/tweet?text=${shareText}&url=${shareLink}`,
             '_blank'
           );
         }
-      });
+      }, 'image/png');
     } catch (error) {
       console.error('Error generating image:', error);
     }
