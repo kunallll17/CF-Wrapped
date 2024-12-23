@@ -25,6 +25,9 @@ const nextConfig = {
     ],
     domains: ['userpic.codeforces.org', 'userpic.codeforces.com', 'codeforces.com', 'ui-avatars.com'],
   },
+  env: {
+    NEXT_PUBLIC_BASE_URL: process.env.NEXT_PUBLIC_BASE_URL || '',
+  },
 };
 
 module.exports = nextConfig;

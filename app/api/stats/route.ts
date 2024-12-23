@@ -32,8 +32,14 @@ async function getUserInfo(handle: string) {
       const currentRankInfo = getRankAndColor(currentRating);
       const maxRankInfo = getRankAndColor(maxRating);
 
+      // Ensure HTTPS and handle both titlePhoto and avatar
+      let profilePicture = user.titlePhoto || user.avatar || '';
+      if (profilePicture) {
+        profilePicture = profilePicture.replace(/^http:/, 'https:');
+      }
+
       return {
-        profilePicture: user.titlePhoto || user.avatar,
+        profilePicture,
         rating: {
           current: currentRating,
           maxRating: maxRating,
@@ -76,8 +82,9 @@ export async function GET(request: Request) {
 
     // Combine all data
     const combinedStats = {
-      ...stats, // your existing stats
-      profilePicture: ratingInfo?.profilePicture || '',
+      ...stats,
+      handle, // Explicitly include handle
+      profilePicture: ratingInfo?.profilePicture || null,
       rating: ratingInfo?.rating || {
         current: 0,
         maxRating: 0,

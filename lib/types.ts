@@ -5,6 +5,8 @@ export interface CodeforcesUser {
   rank: string;
   maxRank: string;
   contribution: number;
+  titlePhoto?: string;
+  avatar?: string;
 }
 
 export interface Submission {

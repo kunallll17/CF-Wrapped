@@ -3,15 +3,19 @@
 import { useEffect, useState, useRef } from 'react';
 import { Card } from '@/components/ui/card';
 import { UserStats } from '@/lib/types';
-import { Crown, Zap, Trophy, Calendar, CalendarDays, Code2, Share2, Download } from 'lucide-react';
+import { Crown, Zap, Trophy, Calendar, CalendarDays, Code2, Share2, Download, Home } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import html2canvas from 'html2canvas';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import React from 'react';
+import { motion } from "framer-motion";
+import StoryContainer from '@/components/StoryPages/StoryContainer';
+import { toast } from "@/components/ui/use-toast";
 
 export const dynamic = 'force-dynamic';
+
 function getContributionColor(count: number): string {
   if (count === 0) return 'bg-[#1b1f23]';
   if (count === 1) return 'bg-[#0e4429]';
@@ -27,19 +31,14 @@ function formatContributionData(data: Record<string, number>) {
   const dates = Object.entries(data)
     .sort((a, b) => a[0].localeCompare(b[0]));
 
-  // Initialize the first week
   let currentWeek: Array<{ date: string; count: number }> = [];
-  
-  // Get the first date and calculate its day of week (0 = Sunday, 6 = Saturday)
   const firstDate = new Date(dates[0][0]);
   const firstDayOfWeek = firstDate.getDay();
   
-  // Add empty days before the first date
   for (let i = 0; i < firstDayOfWeek; i++) {
     currentWeek.push({ date: '', count: 0 });
   }
 
-  // Process all dates
   dates.forEach(([date, count]) => {
     currentWeek.push({ date, count });
     
@@ -49,7 +48,6 @@ function formatContributionData(data: Record<string, number>) {
     }
   });
 
-  // Add remaining days to the last week if needed
   if (currentWeek.length > 0) {
     while (currentWeek.length < 7) {
       currentWeek.push({ date: '', count: 0 });
@@ -81,16 +79,16 @@ function getMonthLabels(weeks: Array<Array<{ date: string; count: number }>>) {
 }
 
 function getRandomAvatar(handle: string) {
-  // Use handle's string to generate a consistent number between 1 and 20
   const hash = handle.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
-  const avatarNumber = (hash % 20) + 1; // Assuming we have 20 avatars
-  return `/avatars/avatar${avatarNumber}.png`; // Make sure your files are named this way
+  const avatarNumber = (hash % 20) + 1;
+  return `/avatars/avatar${avatarNumber}.png`;
 }
 
 export default function WrappedPage({ params }: { params: { handle: string } }) {
   const [stats, setStats] = useState<UserStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [showStory, setShowStory] = useState(true);
   const router = useRouter();
   const wrapperRef = useRef<HTMLDivElement>(null);
 
@@ -248,6 +246,14 @@ export default function WrappedPage({ params }: { params: { handle: string } }) 
     }
   };
 
+  const getProfilePicture = (handle: string) => {
+    return `https://userpic.codeforces.org/user/avatar/${handle}`;
+  };
+
+  const profilePicture = stats?.profilePicture 
+    ? stats.profilePicture.replace(/^http:/, 'https:')
+    : null;
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-black">
@@ -271,15 +277,26 @@ export default function WrappedPage({ params }: { params: { handle: string } }) 
   }
 
   if (!stats) {
+    return null;
+  }
+
+  if (showStory) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-xl text-destructive">Failed to load stats</div>
-      </div>
+      <StoryContainer
+        stats={stats}
+        onComplete={() => setShowStory(false)}
+        onSkip={() => setShowStory(false)}
+      />
     );
   }
 
   return (
-    <div className="min-h-screen bg-black text-white p-8">
+    <motion.div 
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 1 }}
+      className="min-h-screen bg-black text-white p-8"
+    >
       {/* Wrap everything that should be captured in a div with id="wrap" */}
       <div id="wrap" className="max-w-3xl mx-auto space-y-8 bg-black">
         {/* Header */}
@@ -318,7 +335,7 @@ export default function WrappedPage({ params }: { params: { handle: string } }) 
             ) : (
               // Default fallback if no profile picture
               <div className="w-full h-full flex items-center justify-center text-2xl font-bold text-white bg-[#6366f1]">
-                {stats?.handle.substring(0, 2).toUpperCase()}
+                {stats.handle.substring(0, 2).toUpperCase()}
               </div>
             )}
           </div>
@@ -529,7 +546,15 @@ export default function WrappedPage({ params }: { params: { handle: string } }) 
           <Share2 className="w-5 h-5 group-hover:rotate-12 transition-transform duration-200" />
           <span className="font-semibold">Share Wrap</span>
         </Button>
+        <Button
+          onClick={() => router.push('/')}
+          className="flex items-center gap-2 bg-gradient-to-r from-red-500 to-orange-500 hover:from-red-600 hover:to-orange-600 
+          transform hover:scale-105 transition-all duration-200 px-6 py-3 rounded-lg shadow-lg hover:shadow-xl"
+        >
+          <Home className="w-5 h-5" />
+          <span className="font-semibold">Back to Home</span>
+        </Button>
       </div>
-    </div>
+    </motion.div>
   );
 } 
