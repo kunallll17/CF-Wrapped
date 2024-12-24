@@ -9,11 +9,13 @@ import { Trophy, ChevronRight } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
+import { Toaster } from "@/components/ui/toaster";
 
 export default function Home() {
   const [handle, setHandle] = useState('');
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+  const [showCopied, setShowCopied] = useState(false);
 
   const generateWrapped = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -112,16 +114,11 @@ export default function Home() {
   const copyToClipboard = async () => {
     try {
       await navigator.clipboard.writeText('40488690');
-      toast({
-        description: "UPI ID copied to clipboard!",
-        duration: 2000,
-      });
+      setShowCopied(true);
+      // Hide the message after 2 seconds
+      setTimeout(() => setShowCopied(false), 2000);
     } catch (err) {
-      toast({
-        description: "Failed to copy UPI ID",
-        variant: "destructive",
-        duration: 2000,
-      });
+      console.error('Failed to copy');
     }
   };
 
@@ -190,7 +187,7 @@ export default function Home() {
             If you find this tool helpful, consider supporting its developer
           </p>
           
-          <div className="flex flex-col sm:flex-row gap-4">
+          <div className="flex flex-col sm:flex-row gap-4 relative">
             <button
               onClick={copyToClipboard}
               className="flex items-center space-x-2 bg-gray-700/50 p-3 rounded-lg
@@ -201,19 +198,32 @@ export default function Home() {
               <code className="bg-gray-800 px-2 py-1 rounded">40488690</code>
             </button>
 
+            {/* Copied message popup */}
+            {showCopied && (
+              <div className="absolute -top-10 left-1/2 transform -translate-x-1/2 
+                            bg-green-500 text-white px-3 py-1 rounded-md text-sm
+                            animate-fade-in-down">
+                Copied to clipboard!
+              </div>
+            )}
+
             <a
-              href="https://www.paypal.com/paypalme/kunallsharmaaa"
+              href="https://razorpay.me/@kunalsharma9430"
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center justify-center px-4 py-2 bg-[#0070ba] 
-                       hover:bg-[#005ea6] text-white rounded-lg 
+              className="flex items-center justify-center px-4 py-2 bg-[#2b84ea] 
+                       hover:bg-[#2474d0] text-white rounded-lg 
                        transform transition-all duration-200 hover:scale-105
                        active:scale-95"
             >
-              <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M20.067 8.478c.492.315.809.807.983 1.466.174.659.173 1.397-.003 2.212-.175.813-.474 1.527-.897 2.142a5.41 5.41 0 01-1.534 1.451c-.594.394-1.262.685-2.002.874a9.63 9.63 0 01-2.208.283h-3.11l-.834 3.976H7.149l.835-3.976H4.877l.835-3.976h2.107l1.67-7.953h6.513c1.143 0 2.107.174 2.893.524.786.349 1.331.91 1.634 1.681.303.772.302 1.663-.002 2.674-.305 1.012-.903 1.878-1.794 2.601zm-4.565-3.001c-.19.893-.474 1.634-.851 2.225-.377.591-.851 1.026-1.422 1.304-.571.278-1.224.417-1.958.417H9.504l1.67-7.953h1.767c.995 0 1.803.167 2.424.502.621.335 1.027.873 1.217 1.613.19.74.19 1.595 0 2.566z"/>
+              <svg 
+                className="w-5 h-5 mr-2" 
+                viewBox="0 0 24 24" 
+                fill="currentColor"
+              >
+                <path d="M8.75 21V3h6.5v18h-6.5zM3 21V9.5h3.75v11.5H3zm15.25 0V9.5H22v11.5h-3.75z" />
               </svg>
-              Donate with PayPal
+              Donate with Razorpay
             </a>
           </div>
 
@@ -255,6 +265,7 @@ export default function Home() {
           </div>
         </footer>
       </div>
+      <Toaster />
     </main>
   );
 }
