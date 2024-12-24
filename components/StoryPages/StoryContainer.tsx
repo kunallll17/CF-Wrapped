@@ -14,6 +14,7 @@ import PowerLevelStory from './PowerLevelStory';
 import React from 'react';
 import FinalTransition from './FinalTransition';
 import Languages from './Languages';
+import BackgroundMusic from '../Audio/BackgroundMusic';
 
 interface StoryContainerProps {
   stats: UserStats;
@@ -88,8 +89,19 @@ export default function StoryContainer({ stats, onComplete, onSkip }: StoryConta
     return () => window.removeEventListener('keydown', handleKeyPress);
   }, [currentPage, goToNextPage, goToPrevPage, onSkip]);
 
+  useEffect(() => {
+    return () => {
+      const audio = document.querySelector('audio');
+      if (audio) {
+        audio.pause();
+        audio.currentTime = 0;
+      }
+    };
+  }, []);
+
   return (
     <div className="fixed inset-0 bg-black z-50">
+      <BackgroundMusic />
       {/* Progress bars */}
       <div className="absolute top-0 left-0 right-0 flex gap-1 p-2 z-10">
         {stories.map((_, idx) => (
