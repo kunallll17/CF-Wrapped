@@ -3,7 +3,7 @@
 import { useEffect, useState, useRef } from 'react';
 import { Card } from '@/components/ui/card';
 import { UserStats } from '@/lib/types';
-import { Crown, Zap, Trophy, Calendar, CalendarDays, Code2, Share2, Download, Home } from 'lucide-react';
+import { Crown, Zap, Trophy, Calendar, CalendarDays, Code2, Share2, Download, Home, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import html2canvas from 'html2canvas';
@@ -32,13 +32,17 @@ function formatContributionData(data: Record<string, number>) {
     .sort((a, b) => a[0].localeCompare(b[0]));
 
   let currentWeek: Array<{ date: string; count: number }> = [];
+  
+  // Calculate first day offset
   const firstDate = new Date(dates[0][0]);
   const firstDayOfWeek = firstDate.getDay();
   
+  // Add empty cells for the first week
   for (let i = 0; i < firstDayOfWeek; i++) {
     currentWeek.push({ date: '', count: 0 });
   }
 
+  // Process all dates including future dates
   dates.forEach(([date, count]) => {
     currentWeek.push({ date, count });
     
@@ -48,6 +52,7 @@ function formatContributionData(data: Record<string, number>) {
     }
   });
 
+  // Fill the last week if needed
   if (currentWeek.length > 0) {
     while (currentWeek.length < 7) {
       currentWeek.push({ date: '', count: 0 });
@@ -91,6 +96,7 @@ export default function WrappedPage({ params }: { params: { handle: string } }) 
   const [showStory, setShowStory] = useState(true);
   const router = useRouter();
   const wrapperRef = useRef<HTMLDivElement>(null);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const fetchStats = async () => {
@@ -254,6 +260,24 @@ export default function WrappedPage({ params }: { params: { handle: string } }) 
     ? stats.profilePicture.replace(/^http:/, 'https:')
     : null;
 
+  const scrollLeft = () => {
+    if (scrollContainerRef.current) {
+      scrollContainerRef.current.scrollBy({
+        left: -200,
+        behavior: 'smooth'
+      });
+    }
+  };
+
+  const scrollRight = () => {
+    if (scrollContainerRef.current) {
+      scrollContainerRef.current.scrollBy({
+        left: 200,
+        behavior: 'smooth'
+      });
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-black">
@@ -348,37 +372,71 @@ export default function WrappedPage({ params }: { params: { handle: string } }) 
           <div className="space-y-4">
             {stats && (
               <>
-                {/* Contribution Grid - removed month labels section */}
-                <div className="relative w-full overflow-hidden">
-                  <div className="flex gap-1 py-1">
-                    {formatContributionData(stats.contributionData).map((week, weekIndex) => (
-                      <div key={weekIndex} className="grid grid-rows-7 gap-1">
-                        {week.map((day, dayIndex) => (
-                          <div
-                            key={`${weekIndex}-${dayIndex}`}
-                            className={`w-3 h-3 rounded-sm ${getContributionColor(day.count)}`}
-                            title={day.date ? `${day.date}: ${day.count} contributions` : 'No contributions'}
-                          />
-                        ))}
-                      </div>
-                    ))}
+                <div className="text-sm text-gray-400">
+                  {stats.totalSubmissions} submissions in {new Date().getFullYear()}
+                </div>
+                
+                <div className="relative group">
+                  <div 
+                    ref={scrollContainerRef}
+                    className="relative w-full overflow-x-auto scrollbar-none"
+                    style={{
+                      msOverflowStyle: 'none',  /* IE and Edge */
+                      scrollbarWidth: 'none',    /* Firefox */
+                    }}
+                  >
+                    <div 
+                      className="flex gap-1 py-1" 
+                      style={{ 
+                        width: 'max-content'
+                      }}
+                    >
+                      {formatContributionData(stats.contributionData).map((week, weekIndex) => (
+                        <div key={weekIndex} className="grid grid-rows-7 gap-1">
+                          {week.map((day, dayIndex) => (
+                            <div
+                              key={`${weekIndex}-${dayIndex}`}
+                              className={`w-3 h-3 rounded-sm ${getContributionColor(day.count)}`}
+                              title={day.date ? `${day.date}: ${day.count} contributions` : 'No contributions'}
+                            />
+                          ))}
+                        </div>
+                      ))}
+                    </div>
                   </div>
+
+                  <button
+                    onClick={scrollLeft}
+                    className="absolute left-0 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center
+                               bg-black/20 backdrop-blur-sm rounded-full opacity-0 group-hover:opacity-100
+                               transition-opacity duration-200 hover:bg-black/40 z-10"
+                    aria-label="Scroll left"
+                  >
+                    <ChevronLeft className="w-4 h-4 text-white/80" />
+                  </button>
+
+                  <button
+                    onClick={scrollRight}
+                    className="absolute right-0 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center
+                               bg-black/20 backdrop-blur-sm rounded-full opacity-0 group-hover:opacity-100
+                               transition-opacity duration-200 hover:bg-black/40 z-10"
+                    aria-label="Scroll right"
+                  >
+                    <ChevronRight className="w-4 h-4 text-white/80" />
+                  </button>
                 </div>
 
-                {/* Legend */}
                 <div className="flex justify-between items-center text-sm text-gray-400 mt-2">
-                  <span>{stats.totalSubmissions} submissions in 2024</span>
-                  <div className="flex items-center gap-2">
-                    <span>Less</span>
-                    <div className="flex gap-1">
-                      <div className="w-3 h-3 rounded-sm bg-gray-800" />
-                      <div className="w-3 h-3 rounded-sm bg-green-900" />
-                      <div className="w-3 h-3 rounded-sm bg-green-700" />
-                      <div className="w-3 h-3 rounded-sm bg-green-500" />
-                      <div className="w-3 h-3 rounded-sm bg-green-400" />
-                    </div>
-                    <span>More</span>
+                  <span>Less</span>
+                  <div className="flex gap-1">
+                    {[0, 1, 2, 3, 4].map((level) => (
+                      <div
+                        key={level}
+                        className={`w-3 h-3 rounded-sm ${getContributionColor(level * 2)}`}
+                      />
+                    ))}
                   </div>
+                  <span>More</span>
                 </div>
               </>
             )}
