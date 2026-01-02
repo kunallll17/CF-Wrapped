@@ -53,7 +53,7 @@ export default function FinalTransition({ stats, onNext }: FinalTransitionProps)
             </h1>
             
             <p className="text-2xl text-gray-400">
-              Your 2024 Codeforces Wrapped Awaits...
+              Your 2025 Codeforces Wrapped Awaits...
             </p>
           </motion.div>
         </motion.div>

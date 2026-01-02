@@ -40,7 +40,7 @@ const AvatarSelector: React.FC<AvatarSelectorProps> = ({ handle }) => {
         />
       </div>
       <h1 className="text-4xl font-bold">@{handle}</h1>
-      <div className="text-purple-400 text-2xl font-semibold">2024 Year in Code</div>
+      <div className="text-purple-400 text-2xl font-semibold">2025 Year in Code</div>
       {!error && (
         <div className="flex justify-center space-x-2">
           {avatarOptions.map((avatar, index) => (

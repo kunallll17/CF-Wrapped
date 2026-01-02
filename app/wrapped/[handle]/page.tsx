@@ -187,7 +187,7 @@ export default function WrappedPage({ params }: { params: { handle: string } }) 
         const filesArray = [
           new File(
             [blob],
-            `${params.handle}-codeforces-wrapped-2024.png`,
+            `${params.handle}-codeforces-wrapped-2025.png`,
             { type: 'image/png' }
           )
         ];
@@ -196,13 +196,13 @@ export default function WrappedPage({ params }: { params: { handle: string } }) 
           if (navigator.share && navigator.canShare({ files: filesArray })) {
             await navigator.share({
               files: filesArray,
-              title: 'Codeforces Wrapped 2024',
-              text: `Check out my Codeforces Wrapped 2024! @${params.handle}`,
+              title: 'Codeforces Wrapped 2025',
+              text: `Check out my Codeforces Wrapped 2025! @${params.handle}`,
             });
           } else {
             // Fallback for browsers that don't support native sharing
             const shareUrl = canvas.toDataURL('image/png');
-            const shareText = encodeURIComponent(`Check out my Codeforces Wrapped 2024! @${params.handle}`);
+            const shareText = encodeURIComponent(`Check out my Codeforces Wrapped 2025! @${params.handle}`);
             const shareLink = encodeURIComponent(window.location.href);
             
             window.open(
@@ -213,7 +213,7 @@ export default function WrappedPage({ params }: { params: { handle: string } }) 
         } catch (error) {
           console.error('Error sharing:', error);
           // Fallback to Twitter sharing if native sharing fails
-          const shareText = encodeURIComponent(`Check out my Codeforces Wrapped 2024! @${params.handle}`);
+          const shareText = encodeURIComponent(`Check out my Codeforces Wrapped 2025! @${params.handle}`);
           const shareLink = encodeURIComponent(window.location.href);
           
           window.open(
@@ -364,7 +364,7 @@ export default function WrappedPage({ params }: { params: { handle: string } }) 
             )}
           </div>
           <h1 className="text-4xl font-bold">@{stats?.handle}</h1>
-          <div className="text-purple-400 text-2xl font-semibold">2024 Year in Code</div>
+          <div className="text-purple-400 text-2xl font-semibold">2025 Year in Code</div>
         </div>
 
         {/* Contribution Graph */}

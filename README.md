@@ -1,6 +1,6 @@
 # Codeforces Wrapped 🎁
 
-A beautiful visualization of your competitive programming journey on Codeforces in 2024. Inspired by Spotify Wrapped, this tool generates a personalized summary of your Codeforces activity.
+A beautiful visualization of your competitive programming journey on Codeforces in 2025. Inspired by Spotify Wrapped, this tool generates a personalized summary of your Codeforces activity.
 
 ## 🌟 Features
 

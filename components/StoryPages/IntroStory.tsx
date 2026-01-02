@@ -26,7 +26,7 @@ export default function IntroStory({ stats, onNext }: IntroStoryProps) {
           transition={{ duration: 0.8 }}
         >
           <h1 className="text-5xl font-bold text-white mb-4">
-            Your 2024 in Code
+            Your 2025 in Code
           </h1>
           <p className="text-xl text-gray-400">
             Let&apos;s explore your competitive programming journey

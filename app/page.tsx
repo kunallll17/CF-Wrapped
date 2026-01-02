@@ -128,7 +128,7 @@ export default function Home() {
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold mb-4">Codeforces Wrapped</h1>
           <p className="text-xl text-muted-foreground mb-8">
-            Discover your competitive programming journey in 2024
+            Discover your competitive programming journey in 2025
           </p>
           
           <div className="max-w-md mx-auto">
