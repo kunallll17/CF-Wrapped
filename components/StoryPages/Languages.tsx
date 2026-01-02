@@ -3,11 +3,41 @@
 import { motion } from "framer-motion";
 import { useState, useEffect } from "react";
 import { UserStats } from "@/lib/types";
-import { Code2 } from "lucide-react";
+import { Code2, FileCode } from "lucide-react";
 
 interface LanguagesProps {
   stats: UserStats;
   onNext: () => void;
+}
+
+// Language colors mapping
+const languageColors: Record<string, string> = {
+  'C++': '#00599C',
+  'Python': '#3776AB',
+  'Java': '#ED8B00',
+  'JavaScript': '#F7DF1E',
+  'C': '#555555',
+  'C#': '#239120',
+  'Ruby': '#CC342D',
+  'Go': '#00ADD8',
+  'Rust': '#CE422B',
+  'Kotlin': '#7F52FF',
+  'Swift': '#FA7343',
+  'TypeScript': '#3178C6',
+  'PHP': '#777BB4',
+  'Scala': '#DC322F',
+  'Haskell': '#5D4F85',
+  'default': '#8B5CF6'
+};
+
+function getLanguageColor(lang: string): string {
+  // Check if the language contains any of the keys
+  for (const [key, color] of Object.entries(languageColors)) {
+    if (lang.toLowerCase().includes(key.toLowerCase())) {
+      return color;
+    }
+  }
+  return languageColors.default;
 }
 
 export default function Languages({ stats, onNext }: LanguagesProps) {
@@ -17,108 +47,94 @@ export default function Languages({ stats, onNext }: LanguagesProps) {
     setIsVisible(true);
   }, []);
 
+  // Get top 5 languages
+  const sortedLanguages = Object.entries(stats.languageStats || {})
+    .sort(([, a], [, b]) => b - a)
+    .slice(0, 5);
+
+  const maxCount = sortedLanguages[0]?.[1] || 1;
+
   return (
-    <div className="h-screen w-full flex items-center justify-center bg-gradient-to-br from-[#1a1d24] to-black">
-      <div className="max-w-2xl w-full p-8 space-y-8">
+    <div className="story-bg flex items-center justify-center">
+      <div className="relative z-10 max-w-2xl w-full px-8">
+        {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: isVisible ? 1 : 0, y: isVisible ? 0 : 20 }}
           transition={{ duration: 0.8 }}
-          className="text-center"
+          className="text-center mb-12"
         >
-          <h1 className="text-4xl font-bold text-white mb-2">Your Language Mastery</h1>
-          <p className="text-gray-400">Languages you&apos;ve conquered this year</p>
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-purple-500/10 border border-purple-500/20 mb-6">
+            <Code2 className="w-4 h-4 text-purple-400" />
+            <span className="text-sm text-purple-300">Coding Arsenal</span>
+          </div>
+          <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
+            Your Favorite<br />
+            <span className="gradient-text">Languages</span>
+          </h1>
         </motion.div>
 
+        {/* Top Language Highlight */}
         <motion.div
           initial={{ scale: 0.8, opacity: 0 }}
           animate={{ scale: isVisible ? 1 : 0.8, opacity: isVisible ? 1 : 0 }}
-          whileHover={{ scale: 1.05 }}
-          transition={{ delay: 0.3, duration: 0.8 }}
-          className="bg-gradient-to-br from-pink-600/30 to-purple-600/30 p-6 rounded-xl 
-                     hover:from-pink-500/40 hover:to-purple-500/40 
-                     transition-all duration-300 shadow-lg hover:shadow-pink-500/20
-                     cursor-pointer transform-gpu"
+          transition={{ delay: 0.3, duration: 0.8, type: "spring" }}
+          className="flex justify-center mb-12"
         >
-          <div className="flex flex-col items-center space-y-4">
-            <motion.div 
-              className="p-3 bg-pink-500/30 rounded-full 
-                        shadow-inner shadow-pink-400/20 backdrop-blur-sm"
-              whileHover={{ 
-                rotate: 360,
-                transition: { duration: 0.6 }
-              }}
-            >
-              <Code2 className="w-8 h-8 text-pink-300" />
-            </motion.div>
-
-            <div className="text-center">
-              <h2 className="text-2xl font-bold text-white mb-2">
-                Top Language
-              </h2>
-              <p className="text-4xl font-bold text-pink-400 mb-2">
-                {stats.topLanguage || "C++"}
-              </p>
-              <p className="text-gray-400 text-sm">
-                Your go-to language for problem solving
+          <div 
+            className="relative p-8 rounded-3xl border border-white/10"
+            style={{ 
+              background: `linear-gradient(135deg, ${getLanguageColor(stats.topLanguage)}20 0%, transparent 100%)`,
+              borderColor: `${getLanguageColor(stats.topLanguage)}40`
+            }}
+          >
+            <div className="absolute inset-0 rounded-3xl opacity-20 blur-xl"
+                 style={{ background: getLanguageColor(stats.topLanguage) }} />
+            <div className="relative text-center">
+              <FileCode className="w-16 h-16 mx-auto mb-4" style={{ color: getLanguageColor(stats.topLanguage) }} />
+              <p className="text-zinc-400 text-sm mb-2">Most Used Language</p>
+              <h2 className="text-4xl font-bold text-white">{stats.topLanguage}</h2>
+              <p className="text-zinc-500 mt-2">
+                {stats.languageStats?.[stats.topLanguage]?.toLocaleString() || 0} submissions
               </p>
             </div>
           </div>
         </motion.div>
 
-        {stats.languageStats && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: isVisible ? 1 : 0, y: isVisible ? 0 : 20 }}
-            transition={{ delay: 0.6, duration: 0.8 }}
-            className="grid grid-cols-2 gap-3"
-          >
-            {Object.entries(stats.languageStats)
-              .sort(([, a], [, b]) => b - a)
-              .slice(0, 4)
-              .map(([language, count], index) => {
-                const gradients = [
-                  'from-purple-600/30 to-pink-600/30 hover:from-purple-500/40 hover:to-pink-500/40 border-purple-500/30',
-                  'from-blue-600/30 to-cyan-600/30 hover:from-blue-500/40 hover:to-cyan-500/40 border-blue-500/30',
-                  'from-emerald-600/30 to-teal-600/30 hover:from-emerald-500/40 hover:to-teal-500/40 border-emerald-500/30',
-                  'from-orange-600/30 to-amber-600/30 hover:from-orange-500/40 hover:to-amber-500/40 border-orange-500/30'
-                ];
-
-                const textColors = [
-                  'text-purple-300',
-                  'text-blue-300',
-                  'text-emerald-300',
-                  'text-orange-300'
-                ];
-
-                return (
-                  <motion.div 
-                    key={language}
-                    initial={{ opacity: 0, scale: 0.9, y: 20 }}
-                    animate={{ opacity: 1, scale: 1, y: 0 }}
-                    transition={{ 
-                      delay: 0.8 + index * 0.1,
-                      duration: 0.5,
-                      type: "spring",
-                      stiffness: 100
-                    }}
-                    whileHover={{ 
-                      scale: 1.05,
-                      transition: { duration: 0.2 }
-                    }}
-                    className={`bg-gradient-to-br ${gradients[index]} 
-                               p-3 rounded-lg transition-all transform-gpu cursor-pointer
-                               border backdrop-blur-sm shadow-lg`}
-                  >
-                    <p className={`${textColors[index]} text-sm mb-1 font-medium`}>{language}</p>
-                    <p className="text-2xl font-bold text-white">{count}</p>
-                    <p className="text-xs text-gray-400">submissions</p>
-                  </motion.div>
-                );
-            })}
-          </motion.div>
-        )}
+        {/* Language bars */}
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: isVisible ? 1 : 0, y: isVisible ? 0 : 30 }}
+          transition={{ delay: 0.5, duration: 0.8 }}
+          className="space-y-4"
+        >
+          {sortedLanguages.map(([lang, count], index) => (
+            <motion.div
+              key={lang}
+              initial={{ opacity: 0, x: -30 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.6 + index * 0.1, duration: 0.5 }}
+              className="group"
+            >
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-white font-medium">{lang}</span>
+                <span className="text-zinc-400 text-sm">{count.toLocaleString()}</span>
+              </div>
+              <div className="h-3 bg-white/5 rounded-full overflow-hidden">
+                <motion.div
+                  initial={{ width: 0 }}
+                  animate={{ width: `${(count / maxCount) * 100}%` }}
+                  transition={{ delay: 0.8 + index * 0.1, duration: 0.8, ease: "easeOut" }}
+                  className="h-full rounded-full"
+                  style={{ 
+                    background: `linear-gradient(90deg, ${getLanguageColor(lang)}, ${getLanguageColor(lang)}80)`
+                  }}
+                />
+              </div>
+            </motion.div>
+          ))}
+        </motion.div>
       </div>
     </div>
   );
-} 
+}
