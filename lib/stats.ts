@@ -154,13 +154,16 @@ function calculateTopLanguage(submissions: Submission[]): string {
   return topLanguage;
 }
 
+// Target year for the Wrapped experience
+const WRAPPED_YEAR = 2025;
+
 function processSubmissionStats(submissions: Submission[]) {
   const languageCount = new Map<string, number>();
   const tagCount = new Map<string, number>();
   
   const thisYearSubmissions = submissions.filter(sub => {
     const subDate = new Date(sub.creationTimeSeconds * 1000);
-    return subDate.getFullYear() === new Date().getFullYear();
+    return subDate.getFullYear() === WRAPPED_YEAR;
   });
 
   thisYearSubmissions.forEach(submission => {
@@ -210,11 +213,10 @@ export async function processUserStats(
   user: CodeforcesUser,
   submissions: Submission[]
 ): Promise<UserStats> {
-  // Filter submissions for the current year
-  const currentYear = new Date().getFullYear();
+  // Filter submissions for the wrapped year (2025)
   const thisYearSubmissions = submissions.filter(submission => {
     const submissionDate = new Date(submission.creationTimeSeconds * 1000);
-    return submissionDate.getFullYear() === currentYear;
+    return submissionDate.getFullYear() === WRAPPED_YEAR;
   });
 
   // Generate contribution data from submissions

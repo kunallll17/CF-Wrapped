@@ -1,5 +1,8 @@
 import { CodeforcesUser, Submission } from './types';
 
+// Target year for the Wrapped experience
+const WRAPPED_YEAR = 2025;
+
 const FETCH_TIMEOUT = 10000; // 10 seconds
 
 async function fetchWithTimeout(url: string, options: RequestInit = {}) {
@@ -56,12 +59,11 @@ export async function fetchUserSubmissions(handle: string) {
 export function generateContributionData(submissions: Submission[]): Record<string, number> {
   const contributionData: Record<string, number> = {};
   
-  // Get current year and create full year date range
-  const currentYear = new Date().getFullYear();
-  const startDate = new Date(currentYear, 0, 1); // January 1st
-  const endDate = new Date(currentYear, 11, 31); // December 31st
+  // Use wrapped year (2025) for date range
+  const startDate = new Date(WRAPPED_YEAR, 0, 1); // January 1st
+  const endDate = new Date(WRAPPED_YEAR, 11, 31); // December 31st
   
-  // Initialize all dates in current year to 0
+  // Initialize all dates in wrapped year to 0
   for (let d = new Date(startDate); d <= endDate; d.setDate(d.getDate() + 1)) {
     const dateStr = d.toISOString().split('T')[0];
     contributionData[dateStr] = 0;
@@ -71,8 +73,8 @@ export function generateContributionData(submissions: Submission[]): Record<stri
   submissions.forEach(submission => {
     const date = new Date(submission.creationTimeSeconds * 1000);
     
-    // Only count submissions from current year
-    if (date.getFullYear() === currentYear) {
+    // Only count submissions from wrapped year (2025)
+    if (date.getFullYear() === WRAPPED_YEAR) {
       const dateStr = date.toISOString().split('T')[0];
       contributionData[dateStr] = (contributionData[dateStr] || 0) + 1;
     }
@@ -98,10 +100,9 @@ export const RATE_LIMIT = {
 
 async function fetchUserStats(handle: string) {
   try {
-    // Get full year date range
-    const currentYear = new Date().getFullYear();
-    const startDate = new Date(currentYear, 0, 1); // January 1st
-    const endDate = new Date(currentYear, 11, 31); // December 31st
+    // Get full year date range for wrapped year (2025)
+    const startDate = new Date(WRAPPED_YEAR, 0, 1); // January 1st
+    const endDate = new Date(WRAPPED_YEAR, 11, 31); // December 31st
     
     // Convert to Unix timestamp (seconds)
     const fromTimestamp = Math.floor(startDate.getTime() / 1000);
